@@ -17,7 +17,7 @@ def get_project_path():
     获取项目绝对路径
     :return:
     """
-    project_name = "trading_system_autotest"
+    project_name = "ui_pytest"
     file_path = os.path.dirname(__file__)
     return file_path[:file_path.find(project_name) + len(project_name)]
 
