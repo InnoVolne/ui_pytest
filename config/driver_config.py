@@ -35,8 +35,7 @@ class DriverConfig:
         options.add_argument("--disable-dev-shm-usage")
         # driver = webdriver.Chrome(ChromeDriverManager(url="https://registry.npmmirror.com/-/binary/chromedriver",
         #                                               latest_release_url="https://registry.npmmirror.com/-/binary/chromedriver/LATEST_RELEASE",
-        #                                               cache_valid_range=365).install(),
-        #                           options=options)
+        #                                               cache_valid_range=365).install(), options=options)
         # for key, value in os.environ.items():
         #     print(f'{key}: {value}')
         driver = webdriver.Chrome()
