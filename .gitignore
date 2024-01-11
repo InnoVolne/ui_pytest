@@ -1,0 +1,6 @@
+.idea
+*.pyc
+.pytest_cache
+labs
+UIreport
+test.log
