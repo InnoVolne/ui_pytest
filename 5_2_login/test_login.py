@@ -2,7 +2,7 @@
 # coding=utf-8
 # @Time: 2024/1/11 2:40 PM
 # @Author: sophie
-from time import  sleep
+from time import sleep
 from config.driver_config import DriverConfig
 
 driver = DriverConfig().driver_config()
