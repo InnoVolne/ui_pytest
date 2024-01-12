@@ -27,3 +27,28 @@ class HomeBase:
         :return:
         """
         return "//span[starts-with(text(), '欢迎您回来')]"
+
+    def show_data(self):
+        """
+        同级元素的下一个元素
+        我的日历
+        :return:
+        """
+
+        return "//div[text()='我的日历']/following-sibling::div"
+
+    def home_user_avatar(self):
+        """
+        同级元素的上一级元素
+        首页头像
+        :return:
+        """
+        return "//span[contains(text(), '欢迎')]/parent::div/preceding-sibling::div"
+
+    def home_user_avatar2(self):
+        """
+        xpath轴之ancestor（祖先）
+        首页头像
+        :return:
+        """
+        return "//span[text()='我的地址']/ancestor::div[@class='first_card']/div[contains(@class, 'user_avatar')]"
