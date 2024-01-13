@@ -7,9 +7,10 @@
 """
 import time
 from selenium.common.exceptions import ElementNotVisibleException, WebDriverException
-
+from common.yaml_config import GetConf
 
 class ObjectMap:
+    url = GetConf().get_url()
 
     def element_get(self, driver, locate_type, locator_expression, timeout=10, must_be_visible=True):
         """
@@ -116,7 +117,7 @@ class ObjectMap:
         :param driver:
         :param locate_type:
         :param locator_expression:
-        :param timeout: 
+        :param timeout:
         :return:
         """
         if locate_type:
@@ -142,3 +143,29 @@ class ObjectMap:
             pass
 
 
+    def element_to_url(self,
+                       url,
+                       driver,
+                       disappear_locate_type,
+                       disappear_locator_expression,
+                       appear_locate_type,
+                       appear_locator_expression):
+        """
+        跳转地址
+        :param url: 
+        :param driver:
+        :param disappear_locate_type:
+        :param disappear_locator_expression:
+        :param appear_locate_type:
+        :param appear_locator_expression:
+        :return:
+        """
+        try:
+            driver.get(self.url + url)
+            self.wait_for_read_page_complete(driver)
+            self.element_disappear(driver, disappear_locate_type, disappear_locator_expression)
+            self.element_appear(driver, appear_locate_type, appear_locator_expression)
+            return True
+        except Exception as e:
+            print("跳转地址出现异常，异常原因：%s" % e)
+            return False
