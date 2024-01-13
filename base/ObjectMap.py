@@ -65,7 +65,7 @@ class ObjectMap:
             # 查找元素
             try:
                 # 获取页面加载状态
-                page_state = driver.execte_script("return document.readyState")
+                page_state = driver.execute_script("return document.readyState")
                 if page_state == "complete":
                     time.sleep(0.01)
                     return True
@@ -83,7 +83,7 @@ class ObjectMap:
         raise Exception("打开页面时，页面元素在%s秒后仍然没有完全加载完" % timeout)
 
 
-    def  element_disappear(self, driver, locate_type, locator_expression, timeout = 30):
+    def  element_disappear(self, driver, locate_type=None, locator_expression=None, timeout = 30):
         """
         等待页面元素消失的封装
         :param driver: 浏览器驱动
@@ -112,7 +112,7 @@ class ObjectMap:
             pass
 
 
-    def element_appear(self, driver, locate_type, locator_expression, timeout = 30):
+    def element_appear(self, driver, locate_type=None, locator_expression=None, timeout = 30):
         """
         等待元素出现
         :param driver:
@@ -126,9 +126,9 @@ class ObjectMap:
             start_ms = time.time() * 1000
             # 结束时间
             stop_ms = start_ms + (timeout * 1000)
-            for i in range(int(timeout * 1000)):
+            for i in range(int(timeout * 10)):
                 try:
-                    element = driver.execte_script(by=locate_type, value=locator_expression)
+                    element = driver.find_element(by=locate_type, value=locator_expression)
                     if element.is_displayed():
                         return element
                     else:
@@ -145,12 +145,12 @@ class ObjectMap:
 
 
     def element_to_url(self,
-                       url,
                        driver,
-                       disappear_locate_type,
-                       disappear_locator_expression,
-                       appear_locate_type,
-                       appear_locator_expression):
+                       url,
+                       disappear_locate_type=None,
+                       disappear_locator_expression=None,
+                       appear_locate_type=None,
+                       appear_locator_expression=None):
         """
         跳转地址
         :param url:
@@ -187,7 +187,7 @@ class ObjectMap:
             return False
 
 
-    def element_file_value(self, driver, locate_type, locator_expression, fill_value, timeout = 10):
+    def element_fill_value(self, driver, locate_type, locator_expression, fill_value=None, timeout = 10):
         """
         元素填值
         :param driver:
@@ -208,23 +208,27 @@ class ObjectMap:
             try:
                 element = self.element_appear(driver, locate_type, locator_expression, timeout)
                 element.clear()
-                if type(fill_value) is int or type(fill_value) is float:
-                    fill_value = str(fill_value)
-                # 填入的值以\n结尾
-                if fill_value.endswith("\n"):
-                    fill_value = fill_value[:1]
-                element.send_keys(fill_value)
-                element.send_keys(Keys.RETURN)
-                self.wait_for_read_page_complete(driver)
-                return True
             except StaleElementReferenceException as e:
                 raise Exception("元素填值失败,失败原因：%s" % e)
-        except Exception:
-            raise Exception("元素填值失败,失败原因：%s" % StaleElementReferenceException)
+        except Exception as e:
+            raise Exception("元素填值失败,失败原因：%s" % e)
+
+        try:
+            if type(fill_value) is int or type(fill_value) is float:
+                fill_value = str(fill_value)
+                # 填入的值以\n结尾
+            if fill_value.endswith("\n"):
+                fill_value = fill_value[:1]
+            element.send_keys(fill_value)
+            element.send_keys(Keys.RETURN)
+            self.wait_for_read_page_complete(driver)
+            return True
+        except Exception as e:
+            raise Exception("元素填值失败,失败原因：%s" % e)
 
     def element_click(self, driver, locate_type, locator_expression,
-                      locate_type_disappear, locator_expression_disappear,
-                      locate_type_appear, locator_expression_appear,
+                      locate_type_disappear=None, locator_expression_disappear=None,
+                      locate_type_appear=None, locator_expression_appear=None,
                       timeout=30):
         """
         元素点击
