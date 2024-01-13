@@ -219,4 +219,41 @@ class ObjectMap:
                 return True
             except StaleElementReferenceException as e:
                 raise Exception("元素填值失败,失败原因：%s" % e)
-        raise Exception("元素填值失败,失败原因：%s" % StaleElementReferenceException)
+        except Exception:
+            raise Exception("元素填值失败,失败原因：%s" % StaleElementReferenceException)
+
+    def element_click(self, driver, locate_type, locator_expression,
+                      locate_type_disappear, locator_expression_disappear,
+                      locate_type_appear, locator_expression_appear,
+                      timeout=30):
+        """
+        元素点击
+        :param driver:
+        :param locate_type:
+        :param locator_expression:
+        :param locate_type_disappear:
+        :param locator_expression_disappear:
+        :param locate_type_appear:
+        :param locator_expression_appear:
+        :param timeout:
+        :return:
+        """
+        # 元素是否可见
+        element = self.element_appear(driver, locate_type, locator_expression, timeout)
+        try:
+            element.click()
+        except StaleElementReferenceException:
+            self.wait_for_read_page_complete(driver)
+            element = self.element_appear(driver, locate_type, locator_expression, timeout)
+            element.click()
+        except Exception as e:
+            raise Exception("页面异常，元素不可点击,原因：%s" % e)
+        try:
+            self.element_disappear(driver, locate_type_disappear, locator_expression_disappear, timeout)
+            self.element_appear(driver, locate_type_appear, locator_expression_appear, timeout)
+        except Exception as e:
+            print("等待元素消失或者出现失败", e)
+            return False
+        return True
+
+
