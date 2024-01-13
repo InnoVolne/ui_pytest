@@ -6,8 +6,9 @@
 @Data : 2024/1/12 19:22
 """
 import time
-from selenium.common.exceptions import ElementNotVisibleException, WebDriverException, NoSuchElementException
+from selenium.common.exceptions import ElementNotVisibleException, WebDriverException, NoSuchElementException, StaleElementReferenceException
 from common.yaml_config import GetConf
+from selenium.webdriver.common.keys import Keys
 
 class ObjectMap:
     url = GetConf().get_url()
@@ -184,3 +185,38 @@ class ObjectMap:
         except NoSuchElementException:
             # 页面中未出现该元素
             return False
+
+
+    def element_file_value(self, driver, locate_type, locator_expression, fill_value, timeout = 10):
+        """
+        元素填值
+        :param driver:
+        :param locate_type:
+        :param locator_expression:
+        :param fill_value:
+        :param timeout:
+        :return:
+        """
+        try:
+            # 元素必须先出现
+            element = self.element_appear(driver, locate_type, locator_expression, timeout)
+            # 清除元素中的值
+            element.clear()
+        except StaleElementReferenceException:
+            self.wait_for_read_page_complete(driver)
+            time.sleep(0.06)
+            try:
+                element = self.element_appear(driver, locate_type, locator_expression, timeout)
+                element.clear()
+                if type(fill_value) is int or type(fill_value) is float:
+                    fill_value = str(fill_value)
+                # 填入的值以\n结尾
+                if fill_value.endswith("\n"):
+                    fill_value = fill_value[:1]
+                element.send_keys(fill_value)
+                element.send_keys(Keys.RETURN)
+                self.wait_for_read_page_complete(driver)
+                return True
+            except StaleElementReferenceException as e:
+                raise Exception("元素填值失败,失败原因：%s" % e)
+        raise Exception("元素填值失败,失败原因：%s" % StaleElementReferenceException)
