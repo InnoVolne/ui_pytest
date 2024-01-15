@@ -7,7 +7,6 @@
 """
 
 from time import sleep
-from config.driver_config import DriverConfig
 from page.LoginPage import LoginPage
 
 
