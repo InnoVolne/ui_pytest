@@ -1,6 +1,7 @@
 .idea
 *.pyc
 .pytest_cache
+*.log
 labs
 UIreport
 test.log

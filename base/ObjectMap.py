@@ -6,9 +6,16 @@
 @Data : 2024/1/12 19:22
 """
 import time
+import os.path
+import datetime
 from selenium.common.exceptions import ElementNotVisibleException, WebDriverException, NoSuchElementException, StaleElementReferenceException
-from common.yaml_config import GetConf
+
 from selenium.webdriver.common.keys import Keys
+
+from common.yaml_config import GetConf
+from common.tools import get_project_path,sep
+from common.report_add_img import add_img_path_to_report, add_img_to_report
+
 
 class ObjectMap:
     url = GetConf().get_url()
@@ -52,7 +59,7 @@ class ObjectMap:
 
     def wait_for_read_page_complete(self, driver, timeout = 30):
         """
-        判断页面是否加载完成
+        等待页面完全加载完成
         :param driver: 浏览器驱动
         :param timeout: 超时时间
         :return: 返回的元素
@@ -226,9 +233,14 @@ class ObjectMap:
         except Exception as e:
             raise Exception("元素填值失败,失败原因：%s" % e)
 
-    def element_click(self, driver, locate_type, locator_expression,
-                      locate_type_disappear=None, locator_expression_disappear=None,
-                      locate_type_appear=None, locator_expression_appear=None,
+    def element_click(self,
+                      driver,
+                      locate_type,
+                      locator_expression,
+                      locate_type_disappear=None,
+                      locator_expression_disappear=None,
+                      locate_type_appear=None,
+                      locator_expression_appear=None,
                       timeout=30):
         """
         元素点击
@@ -245,14 +257,17 @@ class ObjectMap:
         # 元素是否可见
         element = self.element_appear(driver, locate_type, locator_expression, timeout)
         try:
+            # 点击元素
             element.click()
         except StaleElementReferenceException:
             self.wait_for_read_page_complete(driver)
+            time.sleep(0.06)
             element = self.element_appear(driver, locate_type, locator_expression, timeout)
             element.click()
         except Exception as e:
             raise Exception("页面异常，元素不可点击,原因：%s" % e)
         try:
+            # 点击元素后的元素出现或者消失
             self.element_disappear(driver, locate_type_disappear, locator_expression_disappear, timeout)
             self.element_appear(driver, locate_type_appear, locator_expression_appear, timeout)
         except Exception as e:
@@ -260,4 +275,60 @@ class ObjectMap:
             return False
         return True
 
+    def upload(self,driver, locate_type, locator_expression, file_path):
+        """
+        文件上传
+        :param driver:
+        :param locate_type:
+        :param locator_expression:
+        :param file_path:
+        :return:
+        """
+        element = self.element_get(driver. driver, locate_type, locator_expression)
+        return element.send_keys(file_path)
 
+    def switch_into_iframe(self, driver, locate_type, locator_expression):
+        """
+        进入iframe
+        :param driver:
+        :param locate_type:
+        :param locator_expression:
+        :return:
+        """
+        iframe = self.element_get(driver, locate_type, locator_expression)
+        driver.switch_to.frame(iframe)
+
+    def switch_from_iframe_to_content(self, driver):
+        """
+        从iframe 切回到主界面
+        :param driver:
+        :return:
+        """
+        driver.switch_to.parent_frame()
+
+    def switch_window_2_lastest_handle(self, driver):
+        """
+        句柄切换窗口到最新的窗口
+        :param driver:
+        :return:
+        """
+        window_handles = driver.window_handles
+        driver.switch_to.window(window_handles)
+
+    def find_img_in_source(self,driver, img_name):
+        """
+        截图并在截图中查找图片
+        :param driver:
+        :param img_name:
+        :return:
+        """
+        # 截图后图片保存的地址
+        source_img_path= get_project_path() + sep(["img", "source_img", img_name], add_sep_before=True)
+        # 需要查找的图片路径
+        search_img_path = get_project_path() + sep(["img", "assert_img", img_name], add_sep_before=True)
+        # 截图并保存图片
+        driver.get_screenshot_as_file(source_img_path)
+        time.sleep(3)
+        add_img_path_to_report(source_img_path, "原图")
+        add_img_path_to_report(search_img_path, "需要查找的图")
+        # 在原图中查找是否有指定的图片，返回信息值

@@ -5,6 +5,8 @@
 @Author : Sophie
 @Data : 2024/1/11 23:51
 """
+
+
 class HomeBase:
 
     def wallet_switch(self):
@@ -48,7 +50,14 @@ class HomeBase:
     def home_user_avatar2(self):
         """
         xpath轴之ancestor（祖先）
-        首页头像
+        首页头像大图二
         :return:
         """
         return "//span[text()='我的地址']/ancestor::div[@class='first_card']/div[contains(@class, 'user_avatar')]"
+
+    def user_balance(self):
+        """
+        首页-账户余额
+        :return:
+        """
+        return "//th[text()='账户余额']/parent::tr/following-sibling::tr/td[1]"
